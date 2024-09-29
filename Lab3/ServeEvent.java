@@ -1,24 +1,31 @@
+import java.util.Optional;
+
 public class ServeEvent extends Event {
-    private final Customer customer;
     private final Server server;
 
     public ServeEvent(Customer customer, Server server, double time) {
-        super(time);
-        this.customer = customer;
+        super(customer, time);
+
         this.server = server;
     }
 
     public Pair<Event, Shop> next(Shop shop) {
-        // Create a DoneEvent after service is completed
-        double doneTime = this.getTime() + customer.getServiceTime();
-        Event doneEvent = new DoneEvent(customer, server, doneTime);
-        Shop updatedShop = shop.update(server.serve(customer));
+        // Calculate the done time after service
+        double doneTime = this.getTime() + this.getCustomer().getServiceTime();
 
+        // Create the DoneEvent indicating service completion
+        Event doneEvent = new DoneEvent(this.getCustomer(), server, doneTime);
+
+        // Update the shop with the server's done state
+        Server updatedServer = server.done();
+        Shop updatedShop = shop.update(updatedServer);
+
+        // Return the DoneEvent wrapped in Optional and the updated shop state
         return new Pair<>(doneEvent, updatedShop);
     }
 
     public String toString() {
-        return String.format("%.1f %s served by %s", this.getTime(), customer,
-                             server);
+        return String.format("%.1f %s served by %s", this.getTime(),
+                             this.getCustomer(), server);
     }
 }

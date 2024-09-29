@@ -37,7 +37,7 @@ class Shop {
     @Override
     public String toString() {
         List<String> serverStrings =
-            getServers().map(Server::toString).toList();
+            getServers().map(server -> server.toString()).toList();
         return "[" + String.join(", ", serverStrings) + "]";
     }
 }

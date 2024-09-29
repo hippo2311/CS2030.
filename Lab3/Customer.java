@@ -10,7 +10,10 @@ public class Customer {
         this.serviceTime = serviceTime;
     }
 
-    // Add necessary getter methods
+    public double getId() {
+        return id;
+    }
+
     public double getArrivalTime() {
         return arrivalTime;
     }
@@ -22,6 +25,7 @@ public class Customer {
     public boolean canBeServed(double time) {
         return this.arrivalTime - time >= -THRESHOLD;
     }
+
     public double serveTill(double serviceTime) {
         return serviceTime + this.arrivalTime;
     }

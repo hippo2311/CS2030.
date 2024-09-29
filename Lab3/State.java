@@ -1,38 +1,53 @@
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class State {
     private final PQ<Event> eventQueue;
     private final Shop shop;
+    private final List<String> log;
 
     public State(PQ<Event> eventQueue, Shop shop) {
+        this(eventQueue, shop, List.of());
+    }
+
+    private State(PQ<Event> eventQueue, Shop shop, List<String> log) {
         this.eventQueue = eventQueue;
         this.shop = shop;
+        this.log = log;
     }
 
     public State next() {
-        // Debug print
-        System.out.println("Current Event Queue: " + eventQueue);
+        // Poll the next event from the queue and get Pair<Event, PQ<Event>>
+        Pair<Event, PQ<Event>> currentEventPair = eventQueue.poll();
+        Event currentEvent = currentEventPair.t();    // Get the current event
+        PQ<Event> updatedEventQueue =
+            currentEventPair.u();    // Get the remaining events
 
-        Pair<Optional<Event>, PQ<Event>> currentEventPair = eventQueue.poll();
-        Optional<Event> currentEventOpt = currentEventPair.t();
-        if (!currentEventOpt.isPresent()) {
-            return this;    // No more events, return the current state
-        }
+        // Update the log with the current event's description
+        List<String> updatedLog =
+            Stream.concat(log.stream(), Stream.of(currentEvent.toString()))
+                .toList();
 
-        Event currentEvent = currentEventOpt.get();
-        System.out.println("Processing Event: " + currentEvent);
+        // Get the next event and updated shop state from currentEvent's next method
+        Pair<Event, Shop> nextEventPair = currentEvent.next(shop);
 
-        Pair<Event, Shop> result = currentEvent.next(shop);
-        System.out.println("Next Event: " + result.t() +
-                           ", Updated Shop: " + result.u());
+        // Add the new event to the event queue
+        PQ<Event> finalEventQueue = updatedEventQueue.add(nextEventPair.t());
 
-        PQ<Event> updatedEventQueue = currentEventPair.u().add(result.t());
-        return new State(updatedEventQueue, result.u());
+        // Return the new state with the updated event queue, shop, and log
+        return new State(finalEventQueue, nextEventPair.u(), updatedLog);
+    }
+
+    public boolean isEmpty() {
+        return eventQueue.isEmpty();
     }
 
     @Override
     public String toString() {
-        // Return the current event only, without listing future events
-        return eventQueue.toString();
+        return String.join("\n", log);
+    }
+
+    public void printLog() {
+        log.forEach(System.out::println);
     }
 }
