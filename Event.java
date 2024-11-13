@@ -15,12 +15,6 @@ abstract class Event implements Comparable<Event> {
         return false;
     }
 
-    abstract int getNumberServed();
-
-    abstract int getNumberLeft();
-
-    abstract double waitingTime(Shop shop);
-
     @Override
     public int compareTo(Event event) {
         if (this.eventTime == event.eventTime) {
