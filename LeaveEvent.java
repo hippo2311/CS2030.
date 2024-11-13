@@ -17,22 +17,6 @@ class LeaveEvent extends Event {
         return true;
     }
 
-    int getNumberServed() {
-        return 0;
-    }
-
-    int getNumberLeft() {
-        return 1;
-    }
-
-    int getNumWait() {
-        return 0;
-    }
-
-    double waitingTime(Shop shop) {
-        return 0.0;
-    }
-
     @Override
     public String toString() {
         return String.format("%.3f %s leaves", eventTime, customer);
